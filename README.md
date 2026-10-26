@@ -44,37 +44,99 @@ Use the trained model to predict  for a new input value .
 
 ## PROGRAM
 
-### Name:
+### Name:JOSHITHA SHREE BS
 
-### Register Number:
+### Register Number:212224230107
 
-```python
-class NeuralNet(nn.Module):
+```from sklearn.model_selection import train_test_split
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+import seaborn as sns
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+df=pd.read_csv(r"C:\Users\acer\Downloads\Exp-1.csv")
+df
+x=df[["Input"]].values
+y=df[["Output"]].values
+xt,xst,yt,yst=train_test_split(x,y,test_size=0.2,random_state=52) # check if requires_grad is true, false if not directly specified
+scale1=MinMaxScaler()
+scale2=MinMaxScaler()
+xt=scale1.fit_transform(xt)
+xst=scale1.transform(xst)
+
+xt=torch.FloatTensor(xt)
+xst=torch.FloatTensor(xst)
+yt=torch.FloatTensor(yt)
+yst=torch.FloatTensor(yst)
+class neuralNetwork(nn.Module):
     def __init__(self):
         super().__init__()
-        #Include your code here
+        self.network = nn.Sequential(
+            nn.Linear(1, 16),
+            nn.ReLU(),
+            nn.Linear(16, 8),
+            nn.ReLU(),
+            nn.Linear(8, 1)
 
 
+        )
+    def forward(self, x):
+        return self.network(x)
 
-# Initialize the Model, Loss Function, and Optimizer
+model=neuralNetwork()
+criterion=nn.MSELoss()
+optimizer=torch.optim.Adam(model.parameters(),lr=0.01)
 
+epochs=5000
+losses=[]
 
+for i in range(epochs):
+    optimizer.zero_grad()
+    predictions=model(xt)
+    loss=criterion(predictions,yt)
+    loss.backward()
+    optimizer.step()
+    if i%100==0:
+        print(f"epoch: {i}, loss: {loss.item()}")
+        losses.append(loss.item())
+# %% prediction
+new_data=torch.FloatTensor([[16]])
+new_data=torch.Tensor(scale1.transform(new_data))
+predictions=model(new_data)
+print(predictions.item())
+# %% test
+xst = torch.FloatTensor(xst)
+yst = torch.FloatTensor(yst)
+with torch.no_grad():
+    predictions_l=model(xst)
+    test_loss=criterion(predictions_l,yst)
+    print(f"test loss: {test_loss.item()}")
 
-def train_model(ai_brain, X_train, y_train, criterion, optimizer, epochs=2000):
-    #Include your code here
-
+plt.plot(losses)
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
+plt.title("Loss during training")
+plt.show()
 ```
 
 ### Dataset Information
-Include screenshot of the generated data
+<img width="517" height="321" alt="image" src="https://github.com/user-attachments/assets/040d59a9-6efa-4342-a434-c6383593c2d5" />
+
 
 ### OUTPUT
+<img width="695" height="430" alt="image" src="https://github.com/user-attachments/assets/e1d3f234-c820-443a-acb7-dd190cab14d1" />
+
 
 ### Training Loss Vs Iteration Plot
-Include your plot here
+<img width="886" height="627" alt="image" src="https://github.com/user-attachments/assets/bb3a1411-a013-4c18-b578-232a9a21c04d" />
+
 
 ### New Sample Data Prediction
-Include your sample input and output here
+<img width="822" height="136" alt="image" src="https://github.com/user-attachments/assets/0b4b0d90-2bd1-4f28-807e-2ec86cd540ed" />
+
 
 ## RESULT
 Thus, a neural network regression model was successfully developed and trained using PyTorch.
